@@ -1,11 +1,12 @@
-# rtr
-simplest possible (yet usable) router
+# rur
+simple, deps-free, path/qs router
 
-    var router = rur({
-      routes: [
-        {name: 'home', metainfo: ...}
-      ]
-    });
+    var router = rur();
+    
+    router.routes = [
+      {id: 'home', path: '', metainfo: ...},
+      {id: 'login', path: 'login', ...}
+    ];
 
     router.onChange = function(){
       // router.current.route
@@ -13,6 +14,5 @@ simplest possible (yet usable) router
       console.log(router.current);
     };
 
-    router.go('home');
-    router.start();
-    router.stop();
+    router.init();
+    router.destroy();

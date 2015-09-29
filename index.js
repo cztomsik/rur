@@ -1,60 +1,73 @@
+/* global location, addEventListener, removeEventListener */
 var DOM_EVENT = 'hashchange';
+
+// TODO: config
+var BASE = '#/';
 
 module.exports = rur;
 
-function rur(opts){
-  var routes = {};
+// returns new *uninitialized* router
+// so it can be shared across ES6 modules
+function rur(){
   var router = {
-    current: {
-      route: null,
-      params: null
-    },
+    current: {},
+    routes: null,
+    onChange: null,
 
-    go: function(routeName, params){
-      location = router.url(routeName, params);
-    },
-
-    url: function(routeName, params){
-      return '#' + xyz(routes[routeName], params);
-    },
-
-    start: function(){
+    init: function(){
       addEventListener(DOM_EVENT, update);
-
-      if (router.current.route === null){
-        update();
-      }
+      update();
     },
 
-    stop: function(){
+    urlFor: function(routeId, params){
+      var route = findBy(router.routes, 'id', routeId);
+      var qs = Object.keys(params || {}).map(function(k){
+        return k + '=' + encodeURIComponent(params[k]);
+      }).join('&');
+
+      return BASE + route.path + (qs && ('?' + qs));
+    },
+
+    redirectTo: function(routeId, params){
+      location.assign(this.urlFor(routeId, params));
+    },
+
+    forwardTo: function(routeId, params){
+      location.replace(this.urlFor(routeId, params));
+    },
+
+    destroy: function(){
       removeEventListener(DOM_EVENT, update);
-    },
-
-    onChange: opts.onChange || function(){}
+    }
   };
-
-  opts.routes.forEach(add);
 
   return router;
 
 
-  function add(route){
-    routes[route.name] = route;
-  }
-
   function update(){
-    var str = location.hash.slice(1);
-    var data = JSON.parse(str || '{}');
+    var parts = (location.href.split(BASE)[1] || '').split('?');
 
     router.current = {
-      route: routes[data.page],
-      params: data.params
+      route: findBy(router.routes, 'path', parts[0] || ''),
+      params: parseQs(parts[1])
     };
 
     router.onChange();
   }
+}
 
-  function xyz(route, params){
-    return JSON.stringify({page: route.name, params: params});
+function findBy(arr, key, val){
+  for (var i = 0; i < arr.length; i++) {
+    if (arr[i][key] === val){
+      return arr[i];
+    }
   }
+}
+
+function parseQs(qs){
+  var params = {};
+
+  return qs && qs.replace(/(.*?)=(.*?)(&|$)/g, function(match, key, val){
+    params[key] = decodeURIComponent(val);
+  }) && params;
 }
