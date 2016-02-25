@@ -1,5 +1,5 @@
 import assert from 'assert';
-import Router from '..';
+import rur from '..';
 
 const routes = [
   {path: '/'},
@@ -8,13 +8,13 @@ const routes = [
   {path: '/users/<id>/edit'}
 ];
 
-const r = new Router();
+const r = rur();
 
 r.init({
   routes: routes
 });
 
-describe('', () => {
+describe('routes', () => {
   it('static', () => {
     assert.deepEqual(r.match('/'), {
       route: routes[0],
@@ -36,6 +36,13 @@ describe('', () => {
     assert.deepEqual(r.match('/users/2'), {
       route: routes[2],
       params: {id: 2}
+    });
+  });
+
+  it('qs', () => {
+    assert.deepEqual(r.match('/?q=search'), {
+      route: routes[0],
+      params: {q: 'search'}
     });
   });
 });
