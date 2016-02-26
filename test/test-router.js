@@ -2,10 +2,10 @@ import assert from 'assert';
 import rur from '..';
 
 const routes = [
-  {path: '/'},
-  {path: '/users'},
-  {path: '/users/<id>'},
-  {path: '/users/<id>/edit'}
+  {path: '/', name: 'root'},
+  {path: '/users', name: 'users'},
+  {path: '/users/<id>', name: 'show-user'},
+  {path: '/users/<id>/edit', name: 'edit-user'}
 ];
 
 const r = rur();
@@ -37,6 +37,11 @@ describe('routes', () => {
       route: routes[2],
       params: {id: 2}
     });
+
+    assert.deepEqual(r.match('/users/3/edit'), {
+      route: routes[3],
+      params: {id: 3}
+    });
   });
 
   it('qs', () => {
@@ -44,5 +49,14 @@ describe('routes', () => {
       route: routes[0],
       params: {q: 'search'}
     });
+  });
+
+  it('two way', () => {
+    assert.strictEqual(r.getUrl('root'), '/');
+    assert.strictEqual(r.getUrl('root', {q: 'search'}), '/?q=search');
+
+    assert.strictEqual(r.getUrl('users'), '/users');
+    assert.strictEqual(r.getUrl('show-user', {id: 1}), '/users/1');
+    assert.strictEqual(r.getUrl('edit-user', {id: 1}), '/users/1/edit');
   });
 });

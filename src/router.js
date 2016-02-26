@@ -19,13 +19,22 @@ export default function rur(){
       // find route
       const route = this.routes.find(r => r.name === routeName);
 
+      if ( ! route){
+        throw new Error();
+      }
+
       // inject path params
-      const path = route.path.replace(KEYS, k => params[k]);
+      const pathKeys = keys(route.path);
+      let path = route.path;
+
+      pathKeys.forEach((k) => {
+        path = path.replace('<' + k + '>', params[k]);
+      });
 
       // encode rest of params to query string
-      const qs = getQs(ommit(params, route.path.match(keys)));
+      const qs = getQs(ommit(params, pathKeys || []));
 
-      return path + qs && ('?' + qs);
+      return path + (qs && ('?' + qs));
     },
 
     handle(url){
@@ -42,6 +51,11 @@ export default function rur(){
       const [path, qs] = url.split('?');
 
       const route = this.routes.find(r => getPathRegex(r.path).test(path));
+
+      if ( ! route){
+        return {route: null, params: null};
+      }
+
       const params = zipObject(keys(route.path) || [], path.match(getPathRegex(route.path)).slice(1));
 
       Object.assign(params, parseQs(qs || ''));
@@ -52,7 +66,7 @@ export default function rur(){
 }
 
 function getPathRegex(path){
-  return new RegExp('^' + path.replace(KEYS, '(.*)') + '$');
+  return new RegExp('^' + path.replace(KEYS, '([^/]*?)') + '$');
 }
 
 function keys(path){
@@ -78,6 +92,8 @@ function ommit(obj, keys){
 
     res[k] = obj[k];
   }
+
+  return res;
 }
 
 function getQs(data){
