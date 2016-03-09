@@ -1,20 +1,17 @@
 # RUR
-Batteries-included client-side router
+Minimal client-side router.
 
-## Features
 - named routes
 - pretty urls
-- straighforward API, framework-agnostic
+- simple, easy to use & **understand**, framework-agnostic
 - dependency-free, ES5-compatible
-- simple, [readable source code](https://github.com/cztomsik/rur/blob/master/src/router.js)
+- [readable source code](https://github.com/cztomsik/rur/blob/master/src/router.js)
 
-## Why?
-  - [router.js](https://github.com/tildeio/router.js/) is ember-focused and weighs over 50 KBs
-  - [router5](https://github.com/router5/router5/) does not work in older browsers and needs plugins & polyfills to be actually useful
-  - others do not support opening link in new tab
 
 ## Install
+
     npm install rur --save
+
 
 ## Usage
     var Router = require('rur');
@@ -28,16 +25,20 @@ Batteries-included client-side router
     ];
 
     r.onChange = function(){
-      if ( ! r.match){
+      if ( ! r.state){
         return r.go('home');
       }
 
-      console.log(r);
+      // current route as defined (including custom data)
+      console.log(r.state.route);
+
+      // path params (hash)
+      console.log(r.state.params);
     };
 
     r.start();
 
-To get url
+To get URL
 
     r.getUrl('edit-user', {id: 1});
 
@@ -46,12 +47,11 @@ To go to another page
     r.go('edit-user', {id: 1});
 
 
-## HTML5 urls
-Currently unsupported because:
+## HTML5
+Currently unsupported
 
   - IE9 does not support `pushState()` at all
   - IE10/Edge support is still buggy
   - not even Firefox & Webkit currently behave the same
-  - it requires global link handler (so the default action is prevented and `pushState()` is used) which is kinda hacky and unmodular (and will take some time to implement correctly)
 
-It is probably going to appear in future (with little or no change in the current API)
+It is probably going to appear in future with little or no change in current API but it will take some to implement correctly
