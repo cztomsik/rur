@@ -75,31 +75,36 @@ describe('router', () => {
 
 describe('_match', () => {
   it('static', () => {
-    assert.deepEqual(r._match('/'), {
+    assert.deepStrictEqual(r._match('/'), {
       route: r.routes[0],
       params: {}
     });
 
-    assert.deepEqual(r._match('/users'), {
+    assert.deepStrictEqual(r._match('/users'), {
       route: r.routes[1],
       params: {}
     });
   });
 
   it('dynamic', () => {
-    assert.deepEqual(r._match('/users/1'), {
+    assert.deepStrictEqual(r._match('/users/1'), {
       route: r.routes[2],
-      params: {id: 1}
+      params: {id: '1'}
     });
 
-    assert.deepEqual(r._match('/users/2'), {
+    assert.deepStrictEqual(r._match('/users/2'), {
       route: r.routes[2],
-      params: {id: 2}
+      params: {id: '2'}
     });
 
-    assert.deepEqual(r._match('/users/3/edit'), {
+    assert.deepStrictEqual(r._match('/users/3/edit'), {
       route: r.routes[3],
-      params: {id: 3}
+      params: {id: '3'}
+    });
+
+    assert.deepStrictEqual(r._match('/users/123/edit'), {
+      route: r.routes[3],
+      params: {id: '123'}
     });
   });
 });

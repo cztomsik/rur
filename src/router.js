@@ -43,7 +43,7 @@ export default class Router{
       const match = path.match(pathRegExp(route.path));
 
       if (match){
-        return {route, params: zipObject(pathKeys(route.path), ...match.slice(1))};
+        return {route, params: zipObject(pathKeys(route.path), match.slice(1))};
       }
     }
 
